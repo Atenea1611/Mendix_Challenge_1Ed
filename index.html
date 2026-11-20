@@ -286,7 +286,7 @@
 
             <div class="form-group">
               <label class="form-label">Aval del Profesor (Archivo PDF) *</label>
-              <input type="file" id="reg-file-approval" accept=".pdf" class="form-control"
+              <input type="file" id="reg-file-approval" accept=".pdf,application/pdf" required class="form-control"
                 onchange="App.handleFileSelect(event, 'approval')">
               <small style="color: var(--text-muted); font-size: 0.72rem;">Adjunta la carta o formato firmado en
                 PDF (Se almacena en el sistema para descarga).</small>
@@ -294,7 +294,7 @@
 
             <div class="form-group">
               <label class="form-label">Documento PDF del Proyecto *</label>
-              <input type="file" id="reg-file-doc" accept=".pdf" class="form-control"
+              <input type="file" id="reg-file-doc" accept=".pdf,application/pdf" required class="form-control"
                 onchange="App.handleFileSelect(event, 'doc')">
               <small style="color: var(--text-muted); font-size: 0.72rem;">Documento técnico con ERD, microflujos,
                 persistencia, backlog y pruebas (Se almacena en el sistema para descarga).</small>
@@ -977,10 +977,14 @@
 
           <div class="form-group">
             <label class="form-label">Contraseña *</label>
-            <input type="password" id="judge-reg-password" class="form-control" placeholder="Crea una contraseña segura"
+            <input type="password" id="judge-reg-password" minlength="12" maxlength="128" autocomplete="new-password" class="form-control" placeholder="Crea una contraseña segura"
               required>
           </div>
 
+          <div class="form-group">
+            <label class="form-label" for="judge-reg-invite">Código de invitación de la coordinación *</label>
+            <input id="judge-reg-invite" class="form-control" type="password" autocomplete="off" required>
+          </div>
           <button type="submit" class="btn btn-tec"
             style="width: 100%; padding: 0.7rem; font-size: 0.95rem; margin-top: 0.5rem;">
             Registrar Cuenta de Juez
@@ -1003,7 +1007,7 @@
         <h4 id="success-team-name" style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem;">Equipo
           Registrado</h4>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-          Tu equipo y entregables han sido recibidos satisfactoriamente por la coordinación nacional de Universidad
+          Tu equipo y entregables quedaron guardados en el servidor para su revisión por la coordinación nacional de Universidad
           Tecmilenio.
         </p>
 
@@ -1014,7 +1018,7 @@
             Tu Código Único de Participante:
           </div>
           <div id="success-folio-code"
-            style="font-size: 1.8rem; font-weight: 900; color: var(--tec-green); letter-spacing: 0.05em;">
+            style="font-size: 1.8rem; font-weight: 900; color: var(--tec-green); letter-spacing: 0.05em; overflow-wrap: anywhere;">
             TEC-MAC-2026-XXXX
           </div>
         </div>
@@ -1125,15 +1129,15 @@
         <strong>Mendix Agile Challenge</strong> • Universidad Tecmilenio & Siemens Mendix
       </div>
       <div>
-        Cuenta Administrador: <code>admin@tecmilenio.mx</code> | Despliegue con Custom Agents de Antigravity
+        Mendix Agile Challenge · Primera edición
       </div>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="data.js"></script>
-  <script src="cert_logos.js?v=20261119c"></script>
-  <script src="app.js?v=20261119c"></script>
+  <script src="data.js?v=20261120"></script>
+  <script src="app.js?v=20261120"></script>
 </body>
 
 </html>
+

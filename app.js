@@ -3,8 +3,9 @@
  * Controlador de Interfaz, Eventos, Autoguardado y Cédula de 20 Indicadores
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  App.init();
+document.addEventListener('DOMContentLoaded', async () => {
+  try { await App.init(); }
+  catch { App.showToast('No se pudo conectar al servidor. Recarga la página antes de registrar o evaluar.', 'danger'); }
 });
 
 const App = {
@@ -17,7 +18,8 @@ const App = {
   uploadedApprovalFile: null,
   uploadedDocFile: null,
 
-  init() {
+  async init() {
+    await window.DataStore.refresh();
     this.loadData();
     this.session = window.DataStore.getSession();
 
@@ -52,7 +54,11 @@ const App = {
     });
   },
 
-  switchTab(tabId) {
+  async switchTab(tabId) {
+    try { await window.DataStore.refresh(); }
+    catch { this.showToast('No se pudo actualizar la información. Revisa la conexión e inténtalo de nuevo.', 'danger'); return; }
+    this.session = window.DataStore.getSession();
+    this.renderSessionState();
     this.currentTab = tabId;
     this.loadData();
 
@@ -193,26 +199,15 @@ const App = {
     document.getElementById('modal-login').classList.remove('active');
   },
 
-  fillDemoLogin(type) {
-    if (type === 'admin') {
-      document.getElementById('login-email').value = 'admin@tecmilenio.mx';
-      document.getElementById('login-password').value = 'adminTEC';
-    } else if (type === 'judge1') {
-      document.getElementById('login-email').value = 'roberto.garcia@tecmilenio.mx';
-      document.getElementById('login-password').value = 'juezTEC2026';
-    } else if (type === 'judge2') {
-      document.getElementById('login-email').value = 'laura.sanchez@tecmilenio.mx';
-      document.getElementById('login-password').value = 'juezTEC2026';
-    }
-  },
 
-  submitLogin() {
+  async submitLogin() {
     const email = document.getElementById('login-email').value;
     const pass = document.getElementById('login-password').value;
 
-    const res = window.DataStore.login(email, pass);
+    const res = await window.DataStore.login(email, pass);
     if (res.success) {
       this.session = res.session;
+      document.getElementById('login-password').value = '';
       this.closeLoginModal();
       this.renderSessionState();
       this.showToast(`¡Bienvenido, ${this.session.name}!`, 'success');
@@ -227,8 +222,9 @@ const App = {
     }
   },
 
-  logout() {
-    window.DataStore.clearSession();
+  async logout() {
+    const result = await window.DataStore.clearSession();
+    if (!result.success) { this.showToast(result.message, 'danger'); return; }
     this.session = null;
     this.renderSessionState();
     this.switchTab('home');
@@ -244,23 +240,20 @@ const App = {
 
   handleFileSelect(event, type) {
     const file = event.target.files[0];
+    const key = type === 'approval' ? 'uploadedApprovalFile' : 'uploadedDocFile';
+    this[key] = null;
     if (!file) return;
-
+    if (file.size > 5 * 1024 * 1024 || !/\.pdf$/i.test(file.name)) {
+      event.target.value = '';
+      this.showToast('Selecciona un PDF de hasta 5 MB.', 'warning');
+      return;
+    }
     const reader = new FileReader();
-    reader.onload = (e) => {
-      if (type === 'approval') {
-        this.uploadedApprovalFile = {
-          name: file.name,
-          dataUrl: e.target.result
-        };
-        this.showToast(`Archivo aval "${file.name}" cargado para almacenamiento.`, 'info');
-      } else if (type === 'doc') {
-        this.uploadedDocFile = {
-          name: file.name,
-          dataUrl: e.target.result
-        };
-        this.showToast(`Documento del proyecto "${file.name}" cargado para almacenamiento.`, 'info');
-      }
+    reader.onerror = () => this.showToast('No se pudo leer el archivo. Selecciónalo de nuevo.', 'danger');
+    reader.onload = e => {
+      if (event.target.files[0] !== file) return;
+      this[key] = {name:file.name,dataUrl:e.target.result};
+      this.showToast('PDF listo para enviar.', 'info');
     };
     reader.readAsDataURL(file);
   },
@@ -270,8 +263,9 @@ const App = {
       this.showToast('El equipo puede tener un máximo de 3 integrantes adicionales además del capitán.', 'warning');
       return;
     }
+    let idx = 1;
+    while (document.getElementById(`member-row-${idx}`)) idx++;
     this.memberCount++;
-    const idx = this.memberCount;
     const container = document.getElementById('members-fields-container');
     if (!container) return;
 
@@ -318,6 +312,7 @@ const App = {
     const pForm = document.getElementById('form-participant-registration');
     if (pForm) {
       pForm.querySelectorAll('input, select').forEach(input => {
+        if (input.type === 'file') return;
         input.oninput = () => this.triggerAutosaveParticipant();
         input.onchange = () => this.triggerAutosaveParticipant();
       });
@@ -407,7 +402,7 @@ const App = {
     this.showToast('Borrador restablecido.', 'info');
   },
 
-  submitParticipantRegistration() {
+  async submitParticipantRegistration() {
     const teamName = document.getElementById('reg-team-name').value.trim();
     const campus = document.getElementById('reg-campus').value;
     const profName = document.getElementById('reg-prof-name').value.trim();
@@ -440,6 +435,10 @@ const App = {
     const docFileName = this.uploadedDocFile?.name || (fileDocInput?.files[0]?.name) || 'Manual_Etapa_Docente_Mendix_Agile_Challenge.pdf';
     const docDataUrl = this.uploadedDocFile?.dataUrl || null;
 
+    if (!this.uploadedApprovalFile || !this.uploadedDocFile) {
+      this.showToast('Selecciona ambos PDF y espera a que terminen de cargarse antes de enviar.', 'warning');
+      return;
+    }
     const payload = {
       teamName,
       campus,
@@ -455,7 +454,7 @@ const App = {
       videoUrl
     };
 
-    const res = window.DataStore.registerParticipant(payload);
+    const res = await window.DataStore.registerParticipant(payload);
     if (!res.success) {
       this.showToast(res.message, 'danger');
       return;
@@ -499,16 +498,17 @@ const App = {
     window.DataStore.saveDraftJudge(data);
   },
 
-  submitJudgeRegistration() {
+  async submitJudgeRegistration() {
     const firstName = document.getElementById('judge-reg-name').value.trim();
     const lastName = document.getElementById('judge-reg-lastname').value.trim();
     const payroll = document.getElementById('judge-reg-payroll').value.trim();
     const campus = document.getElementById('judge-reg-campus').value;
     const email = document.getElementById('judge-reg-email').value.trim();
-    const password = document.getElementById('judge-reg-password').value.trim();
+    const password = document.getElementById('judge-reg-password').value;
 
-    const res = window.DataStore.registerJudge({
-      firstName, lastName, payroll, campus, email, password
+    const res = await window.DataStore.registerJudge({
+      firstName, lastName, payroll, campus, email, password,
+      inviteCode: document.getElementById('judge-reg-invite').value
     });
 
     if (!res.success) {
@@ -517,9 +517,11 @@ const App = {
     }
 
     this.closeJudgeRegistrationModal();
+    document.getElementById('judge-reg-password').value = '';
+    document.getElementById('judge-reg-invite').value = '';
     this.showToast('¡Cuenta de juez creada con éxito! Iniciando sesión...', 'success');
 
-    const loginRes = window.DataStore.login(email, password);
+    const loginRes = await window.DataStore.login(email, password);
     if (loginRes.success) {
       this.session = loginRes.session;
       this.renderSessionState();
@@ -546,8 +548,8 @@ const App = {
         pendingContainer.innerHTML = pendingJudges.map(j => `
           <div style="background: var(--warning-light); border: 1px solid var(--warning); padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
             <span>⏳</span>
-            <strong>${j.firstName} ${j.lastName}</strong>
-            <span style="color: var(--text-muted);">(${j.campus})</span>
+            <strong>${this.escapeHTML(j.firstName)} ${this.escapeHTML(j.lastName)}</strong>
+            <span style="color: var(--text-muted);">(${this.escapeHTML(j.campus)})</span>
             <span class="badge badge-pending">${j.assignedParticipants.length} asignados</span>
           </div>
         `).join('');
@@ -582,26 +584,26 @@ const App = {
             const disabledAttr = isSameCampus ? 'disabled' : '';
             const sameTag = isSameCampus ? ' [MISMO CAMPUS]' : '';
             const selected = p.assignedJudgeId === j.id ? 'selected' : '';
-            return `<option value="${j.id}" ${selected} ${disabledAttr}>${j.firstName} ${j.lastName} (${j.campus})${sameTag}</option>`;
+            return `<option value="${j.id}" ${selected} ${disabledAttr}>${this.escapeHTML(j.firstName)} ${this.escapeHTML(j.lastName)} (${this.escapeHTML(j.campus)})${sameTag}</option>`;
           }).join('');
 
         return `
           <tr>
-            <td style="font-weight: 800; font-size: 0.82rem; color: var(--tec-green);">${p.folio}</td>
+            <td style="font-weight: 800; font-size: 0.82rem; color: var(--tec-green);">${this.escapeHTML(p.folio)}</td>
             <td>
-              <div style="font-weight: 700;">${p.teamName}</div>
+              <div style="font-weight: 700;">${this.escapeHTML(p.teamName)}</div>
               <div style="font-size: 0.72rem; color: var(--text-muted);">${p.members.length + 1} integrantes</div>
             </td>
-            <td><span class="badge badge-campus">${p.campus}</span></td>
+            <td><span class="badge badge-campus">${this.escapeHTML(p.campus)}</span></td>
             <td>
-              <div style="font-weight: 600;">${p.captain.firstName} ${p.captain.lastName}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">${p.captain.studentId}</div>
+              <div style="font-weight: 600;">${this.escapeHTML(p.captain.firstName)} ${this.escapeHTML(p.captain.lastName)}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${this.escapeHTML(p.captain.studentId)}</div>
             </td>
             <td>
               <div style="display:flex; gap:0.35rem; align-items:center;">
-                <a href="${p.videoUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Ver Video (3 min)">🎥 Video</a>
-                <a href="${docDownloadUrl}" download="${docFileName}" class="btn btn-tec btn-sm" title="Descargar Documento PDF del Proyecto">📥 PDF</a>
-                <a href="${approvalDownloadUrl}" download="${approvalFileName}" class="btn btn-secondary btn-sm" title="Descargar Aval Docente">📋 Aval</a>
+                <a href="${this.escapeHTML(p.videoUrl)}" target="_blank" class="btn btn-secondary btn-sm" title="Ver Video (3 min)">🎥 Video</a>
+                <a href="${this.escapeHTML(docDownloadUrl)}" download="${this.escapeHTML(docFileName)}" class="btn btn-tec btn-sm" title="Descargar Documento PDF del Proyecto">📥 PDF</a>
+                <a href="${this.escapeHTML(approvalDownloadUrl)}" download="${this.escapeHTML(approvalFileName)}" class="btn btn-secondary btn-sm" title="Descargar Aval Docente">📋 Aval</a>
               </div>
             </td>
             <td>
@@ -635,10 +637,10 @@ const App = {
 
         return `
           <tr>
-            <td style="font-weight: 700;">${j.firstName} ${j.lastName}</td>
-            <td style="font-family: monospace;">${j.payroll}</td>
-            <td><span class="badge badge-campus">${j.campus}</span></td>
-            <td>${j.email}</td>
+            <td style="font-weight: 700;">${this.escapeHTML(j.firstName)} ${this.escapeHTML(j.lastName)}</td>
+            <td style="font-family: monospace;">${this.escapeHTML(j.payroll)}</td>
+            <td><span class="badge badge-campus">${this.escapeHTML(j.campus)}</span></td>
+            <td>${this.escapeHTML(j.email)}</td>
             <td><strong style="color: var(--mendix-blue); font-size: 1rem;">${count}</strong> proyectos</td>
             <td>${confirmedBadge}</td>
             <td style="text-align: right;">
@@ -650,18 +652,35 @@ const App = {
     }
   },
 
-  generateOfficialRanking() {
-    const res = window.DataStore.generateOfficialRanking();
+  async generateOfficialRanking() {
+    const res = await window.DataStore.generateOfficialRanking();
     if (res.success) {
       this.showToast(`¡Ranking Nacional generado exitosamente con el Top 10 de mejores puntajes!`, 'success');
       this.switchTab('ranking');
     } else {
-      this.showToast('No fue posible generar el ranking.', 'danger');
+      if (res.tieGroups) {
+        for (const group of res.tieGroups) {
+          const order = prompt('Existe un empate completo. Con el dictamen del comité, escribe los folios en orden de preferencia, separados por comas:\n\n' +
+            group.map(p => p.folio + ' — ' + p.teamName).join('\n'));
+          if (!order) return;
+          const folios = order.split(',').map(s => s.trim().toUpperCase());
+          const ids = folios.map(f => group.find(p => p.folio === f)?.id);
+          if (ids.some(id => !id) || ids.length !== group.length || new Set(ids).size !== ids.length) {
+            this.showToast('Incluye cada folio del empate exactamente una vez.', 'warning'); return;
+          }
+          const reason = prompt('Registra la justificación del dictamen del comité (mínimo 10 caracteres):');
+          if (!reason) return;
+          const decision = await window.DataStore.action('recordTieDecision', ids, reason);
+          if (!decision.success) { this.showToast(decision.message, 'danger'); return; }
+        }
+        return this.generateOfficialRanking();
+      }
+      this.showToast(res.message || 'No fue posible generar el ranking.', 'danger');
     }
   },
 
-  runAutoAssignmentWorkflow() {
-    const res = window.DataStore.runAutoAssignment();
+  async runAutoAssignmentWorkflow() {
+    const res = await window.DataStore.runAutoAssignment();
     if (res.success) {
       this.showToast(res.message, res.warning ? 'warning' : 'success');
       this.renderAdminPanel();
@@ -670,8 +689,8 @@ const App = {
     }
   },
 
-  onAdminChangeJudgeAssignment(partId, judgeId) {
-    const res = window.DataStore.setManualAssignment(partId, judgeId);
+  async onAdminChangeJudgeAssignment(partId, judgeId) {
+    const res = await window.DataStore.setManualAssignment(partId, judgeId);
     if (!res.success) {
       this.showToast(res.message, 'danger');
       this.renderAdminPanel();
@@ -681,17 +700,19 @@ const App = {
     }
   },
 
-  deleteParticipantConfirm(id) {
+  async deleteParticipantConfirm(id) {
     if (confirm('¿Estás seguro de eliminar este registro de participante?')) {
-      window.DataStore.deleteParticipant(id);
+      const result = await window.DataStore.deleteParticipant(id);
+      if (!result.success) { this.showToast(result.message, 'danger'); return; }
       this.showToast('Participante eliminado.', 'info');
       this.renderAdminPanel();
     }
   },
 
-  deleteJudgeConfirm(id) {
+  async deleteJudgeConfirm(id) {
     if (confirm('¿Estás seguro de eliminar este juez? Sus proyectos asignados quedarán sin asignar.')) {
-      window.DataStore.deleteJudge(id);
+      const result = await window.DataStore.deleteJudge(id);
+      if (!result.success) { this.showToast(result.message, 'danger'); return; }
       this.showToast('Juez eliminado.', 'info');
       this.renderAdminPanel();
     }
@@ -729,7 +750,7 @@ const App = {
         const evaluatedTag = p.evaluation && p.evaluation.finalScore !== undefined ?
           (p.evaluation.isLocked ? `🔒 Calificado y Listo: ${p.evaluation.finalScore} pts` : `📝 Borrador: ${p.evaluation.finalScore} pts`) :
           '⏳ Sin calificar';
-        return `<option value="${p.id}">${p.folio} - ${p.teamName} (${p.campus}) [${evaluatedTag}]</option>`;
+        return `<option value="${p.id}">${this.escapeHTML(p.folio)} - ${this.escapeHTML(p.teamName)} (${this.escapeHTML(p.campus)}) [${evaluatedTag}]</option>`;
       }).join('');
 
     if (this.selectedJudgeParticipantId && assignedIds.includes(this.selectedJudgeParticipantId)) {
@@ -767,9 +788,9 @@ const App = {
     const approvalFileName = p.professorApprovalFileName || p.professorApprovalFile || 'Aval_Docente.pdf';
 
     document.getElementById('dossier-links').innerHTML = `
-      <a href="${p.videoUrl}" target="_blank" class="btn btn-tec btn-sm">🎥 Ver Video (Máx 3 min)</a>
-      <a href="${docDownloadUrl}" download="${docFileName}" class="btn btn-secondary btn-sm" title="Descargar Documento PDF del Proyecto">📥 Descargar Documento PDF</a>
-      <a href="${approvalDownloadUrl}" download="${approvalFileName}" class="btn btn-secondary btn-sm" title="Descargar Aval Docente">📋 Descargar Aval Docente</a>
+      <a href="${this.escapeHTML(p.videoUrl)}" target="_blank" class="btn btn-tec btn-sm">🎥 Ver Video (Máx 3 min)</a>
+      <a href="${this.escapeHTML(docDownloadUrl)}" download="${this.escapeHTML(docFileName)}" class="btn btn-secondary btn-sm" title="Descargar Documento PDF del Proyecto">📥 Descargar Documento PDF</a>
+      <a href="${this.escapeHTML(approvalDownloadUrl)}" download="${this.escapeHTML(approvalFileName)}" class="btn btn-secondary btn-sm" title="Descargar Aval Docente">📋 Descargar Aval Docente</a>
     `;
 
     // Cargar indicadores o iniciar en 0
@@ -867,7 +888,7 @@ const App = {
                      id="input-ind-${item.code}" 
                      min="0" 
                      max="5" 
-                     step="0.1" 
+                     step="5" 
                      value="${val}" 
                      style="width: 75px; text-align: center; font-weight: 800; font-size: 0.9rem; padding: 0.25rem;"
                      oninput="App.onIndicatorInputChange('${item.code}', '${blockKey}', this.value)" 
@@ -887,7 +908,10 @@ const App = {
     if (!this.currentEvaluationState || this.currentEvaluationState.isLocked) return;
     let numeric = parseFloat(value);
     if (isNaN(numeric) || numeric < 0) numeric = 0;
-    if (numeric > 5) numeric = 5;
+    if (numeric !== 0 && numeric !== 5) {
+      this.showToast('Cada indicador solo admite 0 o 5 puntos.', 'warning');
+      return;
+    }
 
     this.currentEvaluationState.indicators[code] = numeric;
     this.onUpdateScoreCalculations();
@@ -924,7 +948,7 @@ const App = {
 
     const R = parseFloat((subA + subB + subC + subD + subE).toFixed(2));
     const contributionR = parseFloat((R * 0.90).toFixed(2));
-    const G = parseFloat(document.getElementById('input-eval-G').value) || 0;
+    const G = Number(document.getElementById('input-eval-G').value);
     const finalScore = parseFloat((contributionR + G).toFixed(2));
 
     document.getElementById('live-R-score').textContent = `${R} / 100`;
@@ -947,7 +971,7 @@ const App = {
     }
   },
 
-  saveCurrentProjectEvaluation(isLocking = false) {
+  async saveCurrentProjectEvaluation(isLocking = false) {
     if (!this.selectedJudgeParticipantId) return;
 
     const ind = this.currentEvaluationState.indicators || {};
@@ -966,8 +990,12 @@ const App = {
     if (subD > 15) { this.showToast(`La sección D excede el máximo permitido de 15 puntos (actual: ${subD.toFixed(1)}).`, 'danger'); return; }
     if (subE > 15) { this.showToast(`La sección E excede el máximo permitido de 15 puntos (actual: ${subE.toFixed(1)}).`, 'danger'); return; }
 
-    const G = parseFloat(document.getElementById('input-eval-G').value) || 0;
+    const G = Number(document.getElementById('input-eval-G').value);
     const justification = document.getElementById('input-eval-justification').value.trim();
+    if (!Number.isFinite(G) || G < 0 || G > 10 || Math.abs(G * 10 - Math.round(G * 10)) > 1e-8) {
+      this.showToast('La valoración G debe estar entre 0 y 10, con máximo un decimal.', 'warning');
+      return;
+    }
 
     if (isLocking && (!justification || justification.length < 10)) {
       this.showToast('La justificación de la valoración global G es obligatoria y fundamentada para marcar el proyecto como listo.', 'warning');
@@ -987,7 +1015,7 @@ const App = {
       justificationG: justification
     };
 
-    const res = window.DataStore.saveEvaluation(this.selectedJudgeParticipantId, payload, isLocking);
+    const res = await window.DataStore.saveEvaluation(this.selectedJudgeParticipantId, payload, isLocking);
     if (!res.success) {
       this.showToast(res.message, 'danger');
       return;
@@ -1023,8 +1051,8 @@ const App = {
           <div class="card" style="border-top: 5px solid ${borderColors[idx]}; text-align: center; padding: 1.5rem;">
             <div style="font-size: 2.5rem; margin-bottom: 0.3rem;">${idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉')}</div>
             <span class="badge badge-confirmed" style="margin-bottom: 0.5rem;">${medals[idx]}</span>
-            <h3 style="font-size: 1.25rem; font-weight: 900;">${p.teamName}</h3>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">${p.campus}</div>
+            <h3 style="font-size: 1.25rem; font-weight: 900;">${this.escapeHTML(p.teamName)}</h3>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${this.escapeHTML(p.campus)}</div>
             <div style="font-size: 2.2rem; font-weight: 900; color: var(--tec-green); margin: 0.6rem 0;">
               ${p.evaluation.finalScore.toFixed(2)}
             </div>
@@ -1049,9 +1077,9 @@ const App = {
         return `
           <tr>
             <td style="font-weight: 900; font-size: 1rem;">${placeTag}</td>
-            <td style="font-weight: 700; color: var(--tec-green);">${p.folio}</td>
-            <td style="font-weight: 800;">${p.teamName}</td>
-            <td><span class="badge badge-campus">${p.campus}</span></td>
+            <td style="font-weight: 700; color: var(--tec-green);">${this.escapeHTML(p.folio)}</td>
+            <td style="font-weight: 800;">${this.escapeHTML(p.teamName)}</td>
+            <td><span class="badge badge-campus">${this.escapeHTML(p.campus)}</span></td>
             <td>${e.subtotalA}</td>
             <td>${e.subtotalB}</td>
             <td>${e.subtotalC}</td>
@@ -1073,7 +1101,13 @@ const App = {
 
     top10.forEach((p, idx) => {
       const e = p.evaluation;
-      csv += `"${idx + 1}","${p.folio}","${p.teamName.replace(/"/g, '""')}","${p.campus}","${p.captain.firstName} ${p.captain.lastName}","${e.subtotalA}","${e.subtotalB}","${e.subtotalC}","${e.subtotalD}","${e.subtotalE}","${e.R}","${e.contributionR}","${e.G}","${e.finalScore}"\n`;
+      const cell = value => {
+        let s = String(value ?? '');
+        if (/^[=+@\-\t\r]/.test(s)) s = "'" + s;
+        return '"' + s.replace(/"/g, '""') + '"';
+      };
+      csv += [idx+1,p.folio,p.teamName,p.campus,p.captain.firstName+' '+p.captain.lastName,
+        e.subtotalA,e.subtotalB,e.subtotalC,e.subtotalD,e.subtotalE,e.R,e.contributionR,e.G,e.finalScore].map(cell).join(',')+'\n';
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1108,9 +1142,11 @@ const App = {
     }
   },
 
-  toggleRankingVisibility() {
+  async toggleRankingVisibility() {
     if (!this.session || this.session.role !== 'admin') return;
-    const newState = window.DataStore.toggleRankingVisibility();
+    const result = await window.DataStore.toggleRankingVisibility();
+    if (!result.success) { this.showToast(result.message, 'danger'); return; }
+    const newState = result.visible;
     this.renderSessionState();
     this.updateRankingVisibilityButton();
     if (newState) {
@@ -1182,14 +1218,14 @@ const App = {
 
       return `
         <tr>
-          <td style="font-weight: 700; color: var(--tec-green);">${p.folio}</td>
-          <td style="font-weight: 800;">${p.teamName}</td>
-          <td><span class="badge badge-campus">${p.campus}</span></td>
+          <td style="font-weight: 700; color: var(--tec-green);">${this.escapeHTML(p.folio)}</td>
+          <td style="font-weight: 800;">${this.escapeHTML(p.teamName)}</td>
+          <td><span class="badge badge-campus">${this.escapeHTML(p.campus)}</span></td>
           <td>
-            <strong>${p.captain.firstName} ${p.captain.lastName}</strong><br>
-            <small style="color: var(--text-muted);">${p.captain.email}</small>
+            <strong>${this.escapeHTML(p.captain.firstName)} ${this.escapeHTML(p.captain.lastName)}</strong><br>
+            <small style="color: var(--text-muted);">${this.escapeHTML(p.captain.email)}</small>
           </td>
-          <td style="font-size: 0.8rem; max-width: 250px; color: var(--text-secondary);">${allMembers}</td>
+          <td style="font-size: 0.8rem; max-width: 250px; color: var(--text-secondary);">${this.escapeHTML(allMembers)}</td>
           <td>${statusBadge}</td>
           <td style="text-align: right; white-space: nowrap;">
             <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
@@ -1228,10 +1264,10 @@ const App = {
 
       return `
         <tr>
-          <td style="font-weight: 700; font-family: monospace;">${j.payroll}</td>
-          <td style="font-weight: 800;">${j.firstName} ${j.lastName}</td>
-          <td><span class="badge badge-campus">${j.campus}</span></td>
-          <td><small style="font-weight: 600;">${j.email}</small></td>
+          <td style="font-weight: 700; font-family: monospace;">${this.escapeHTML(j.payroll)}</td>
+          <td style="font-weight: 800;">${this.escapeHTML(j.firstName)} ${this.escapeHTML(j.lastName)}</td>
+          <td><span class="badge badge-campus">${this.escapeHTML(j.campus)}</span></td>
+          <td><small style="font-weight: 600;">${this.escapeHTML(j.email)}</small></td>
           <td>${statusBadge}</td>
           <td style="text-align: right; white-space: nowrap;">
             <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
@@ -1325,10 +1361,10 @@ const App = {
             </div>
 
             <h3 style="font-size: 1.35rem; font-weight: 900; color: var(--siemens-navy); margin-bottom: 0.2rem;">
-              ${p.teamName}
+              ${this.escapeHTML(p.teamName)}
             </h3>
             <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-              ${p.campus} • Folio: ${p.folio}
+              ${this.escapeHTML(p.campus)} • Folio: ${this.escapeHTML(p.folio)}
             </div>
 
             <div style="background: var(--bg-subtle); padding: 0.75rem; border-radius: var(--radius-sm); margin: 0.75rem 0;">
@@ -1339,8 +1375,8 @@ const App = {
             </div>
 
             <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
-              <strong>Capitán:</strong> ${p.captain.firstName} ${p.captain.lastName} (${p.captain.email})<br>
-              <strong>Integrantes:</strong> ${allMembers}
+              <strong>Capitán:</strong> ${this.escapeHTML(p.captain.firstName)} ${this.escapeHTML(p.captain.lastName)} (${this.escapeHTML(p.captain.email)})<br>
+              <strong>Integrantes:</strong> ${this.escapeHTML(allMembers)}
             </div>
 
             <div style="margin-bottom: 1.25rem;">
@@ -1445,7 +1481,7 @@ const App = {
         img.src = src;
       });
 
-      // Usar assets embebidos (Base64) para evitar bloqueo CORS en file://
+      // Las imágenes se sirven desde el mismo origen que el portal.
       const assets = (typeof CertAssets !== 'undefined') ? CertAssets : {};
       const medalSrc = certData.medalImg === 'Medalla_1.png' ? assets.MEDALLA_1
                      : certData.medalImg === 'Medalla_2.png' ? assets.MEDALLA_2
@@ -1456,7 +1492,7 @@ const App = {
         loadImage(assets.LOGO_TEC    || 'Universidad_Tecmilenio.png'),
         loadImage(assets.LOGO_SIEMENS|| 'Siemens-Logo.wine.png'),
         loadImage(assets.LOGO_MENDIX || 'LogoMendixChallenge_1_Edition.png'),
-        loadImage(medalSrc)
+        loadImage(medalSrc || certData.medalImg)
       ]).then(([logoTec, logoSiemens, logoMendix, medalImg]) => {
         // ── Fondo blanco limpio (igual que plantilla PPTX) ──
         ctx.fillStyle = '#FFFFFF';
@@ -1656,7 +1692,7 @@ const App = {
     const recipEl = document.getElementById('cert-preview-recipient-info');
 
     titleEl.textContent = `Reconocimiento Oficial: ${certData.categoryText}`;
-    recipEl.innerHTML = `<strong>Otorgado a:</strong> ${certData.recipientName} (${certData.campusText}) &bull; Correo: <span style="color: var(--mendix-blue);">${certData.recipientEmail}</span>`;
+    recipEl.innerHTML = `<strong>Otorgado a:</strong> ${this.escapeHTML(certData.recipientName)} (${this.escapeHTML(certData.campusText)}) &bull; Correo: <span style="color: var(--mendix-blue);">${this.escapeHTML(certData.recipientEmail)}</span>`;
 
     modal.classList.add('active');
     this.drawCertificate(canvas, certData);
@@ -1757,8 +1793,8 @@ const App = {
     const btnSend = document.getElementById('btn-confirm-send-email');
 
     progressEl.style.display = 'none';
-    btnSend.disabled = false;
-    btnSend.textContent = '🚀 Confirmar y Enviar Correo';
+    btnSend.disabled = true;
+    btnSend.textContent = 'Envío por correo no configurado';
 
     toEl.textContent = `${certData.recipientName} <${certData.recipientEmail}>`;
     subjEl.textContent = `🎓 Reconocimiento Oficial: ${certData.categoryText} • Mendix Agile Challenge 2026`;
@@ -1783,87 +1819,20 @@ Universidad Tecmilenio & Siemens Mendix`;
   },
 
   executeEmailSend() {
-    if (!this.pendingEmailInfo) return;
-    const { type, targetId, email, name } = this.pendingEmailInfo;
-
-    const progressEl = document.getElementById('email-send-progress-container');
-    const progressBar = document.getElementById('email-progress-bar');
-    const progressStatus = document.getElementById('email-progress-status');
-    const btnSend = document.getElementById('btn-confirm-send-email');
-
-    btnSend.disabled = true;
-    progressEl.style.display = 'block';
-    progressBar.style.width = '30%';
-    progressStatus.textContent = `Conectando con el servidor de correo institucional para ${email}...`;
-
-    setTimeout(() => {
-      progressBar.style.width = '75%';
-      progressStatus.textContent = `Adjuntando reconocimiento oficial en alta resolución...`;
-
-      setTimeout(() => {
-        progressBar.style.width = '100%';
-        progressStatus.textContent = `¡Correo enviado satisfactoriamente!`;
-
-        window.DataStore.markCertificateSent(targetId, type, email);
-        this.renderCertificatesTab();
-
-        setTimeout(() => {
-          this.closeEmailSenderModal();
-          this.showToast(`Reconocimiento enviado exitosamente al correo: ${email}`, 'success');
-        }, 500);
-      }, 500);
-    }, 400);
+    this.showToast('El envío por correo no está configurado. Descarga el reconocimiento para enviarlo manualmente.', 'warning');
   },
 
-  sendBatchCertificates(category) {
-    this.loadData();
-    let recipients = [];
-
-    if (category === 'captains') {
-      recipients = (this.data.participants || []).map(p => ({
-        id: p.id,
-        type: 'captain',
-        name: p.teamName,
-        email: p.captain.email
-      }));
-    } else if (category === 'judges') {
-      recipients = (this.data.judges || []).map(j => ({
-        id: j.id,
-        type: 'judge',
-        name: `${j.firstName} ${j.lastName}`,
-        email: j.email
-      }));
-    } else if (category === 'winners') {
-      const top3 = window.DataStore.getOfficialRanking().slice(0, 3);
-      recipients = top3.map((p, idx) => ({
-        id: p.id,
-        type: `winner_${idx + 1}`,
-        name: p.teamName,
-        email: p.captain.email
-      }));
-    }
-
-    if (recipients.length === 0) {
-      this.showToast('No hay destinatarios disponibles en esta categoría para enviar reconocimientos.', 'warning');
-      return;
-    }
-
-    const confirmMsg = `¿Deseas enviar por correo los reconocimientos oficiales a todos los ${recipients.length} destinatarios de esta categoría?`;
-    if (!confirm(confirmMsg)) return;
-
-    let sentCount = 0;
-    recipients.forEach(r => {
-      window.DataStore.markCertificateSent(r.id, r.type, r.email);
-      sentCount++;
-    });
-
-    this.renderCertificatesTab();
-    this.showToast(`¡Se han enviado con éxito ${sentCount} reconocimientos oficiales por correo electrónico!`, 'success');
+  sendBatchCertificates() {
+    this.showToast('El envío por correo no está configurado. No se ha enviado ningún reconocimiento.', 'warning');
   },
 
   // -------------------------------------------------------------
   // TOAST NOTIFICATIONS
   // -------------------------------------------------------------
+  escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  },
+
   showToast(msg, type = 'info') {
     let container = document.getElementById('toast-container');
     if (!container) {
@@ -1880,7 +1849,7 @@ Universidad Tecmilenio & Siemens Mendix`;
     if (type === 'warning') icon = '⚠️';
     if (type === 'danger') icon = '🛑';
 
-    toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+    toast.innerHTML = `<span>${icon}</span> <span>${this.escapeHTML(msg)}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
@@ -1892,3 +1861,6 @@ Universidad Tecmilenio & Siemens Mendix`;
 };
 
 window.App = App;
+
+window.App = App;
+

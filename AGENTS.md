@@ -18,7 +18,11 @@ Este repositorio alberga la plataforma web y el ecosistema de **Custom Agents y 
 4. `agile-challenge-facilitation/SKILL.md`: Caso de Gestión de Eventos Corporativos (GCS) y plantillas de backlog.
 5. `platform-web-dev/SKILL.md`: Arquitectura web, autoguardado en localStorage y seguridad.
 
-## Credenciales y Roles por Defecto
-- **Administrador General:** `admin@tecmilenio.mx` / `adminTEC`
-- **Jueces:** Creados en el formulario de juez o precargados (ej: `roberto.garcia@tecmilenio.mx` / `juezTEC2026`).
-- **Participantes:** Registro público con generación de Folio único (`TEC-MAC-2026-XXXX`).
+## Arquitectura y verificación actuales
+- Node.js 24 y SQLite en un volumen persistente. Instrucciones: `README_SERVER.md`.
+- Credenciales de administración configuradas al crear la base; no hay contraseñas de demostración ni datos precargados.
+- Registro de jueces por invitación. Sesiones HttpOnly y permisos comprobados en el servidor.
+- `data.js` es un puente asíncrono; únicamente los borradores de formulario utilizan localStorage.
+- Los agentes y procedimientos heredados son documentación de referencia. Para seguridad, persistencia y acceso prevalece esta arquitectura.
+- Ejecutar `npm test` al modificar registro, permisos, evaluación o ranking.
+
