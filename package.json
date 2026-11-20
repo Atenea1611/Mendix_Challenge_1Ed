@@ -1,0 +1,11 @@
+{
+  "name": "mendix-challenge",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Portal del concurso con almacenamiento compartido y sesiones de servidor",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server/index.cjs",
+    "test": "node --test test/*.test.cjs"
+  }
+}
