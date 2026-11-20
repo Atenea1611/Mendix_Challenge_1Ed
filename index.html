@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mendix Agile Challenge | Universidad Tecmilenio</title>
+  <link rel="stylesheet" href="styles.css?v=20261119b">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300B04F'/><text y='70' x='50' text-anchor='middle' font-size='60' font-family='sans-serif' font-weight='bold' fill='white'>T</text></svg>">
+</head>
+
+<body>
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logos-wrapper">
+          <img src="Universidad_Tecmilenio.png?v=2" alt="Universidad Tecmilenio"
+            style="height: 50px; max-width: 220px; object-fit: contain;">
+        </div>
+        <div class="brand-text">
+          <h1>Mendix Agile Challenge</h1>
+          <span>Universidad Tecmilenio • Concurso Nacional</span>
+        </div>
+      </div>
+
+      <div class="header-user-status">
+        <!-- Indicador de Sesión Activa -->
+        <div id="session-info-pill" class="user-pill" style="display: none;">
+          <span id="session-role-badge" class="badge badge-campus">Rol</span>
+          <span id="session-user-name" style="font-weight: 700;">Usuario</span>
+        </div>
+
+        <button id="theme-toggle-btn" class="icon-btn" title="Alternar Modo Oscuro / Claro">🌙</button>
+
+        <!-- Botones de Acción según estado de autenticación -->
+        <button id="btn-header-register" class="btn btn-tec btn-sm" onclick="App.openParticipantModal()">
+          📝 Regístrate
+        </button>
+
+        <button id="btn-header-login" class="btn btn-secondary btn-sm" onclick="App.openLoginModal()">
+          🔐 Iniciar Sesión
+        </button>
+
+        <button id="btn-header-logout" class="btn btn-danger btn-sm" style="display: none;" onclick="App.logout()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-bar">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="home">🏛️ Convocatoria</button>
+      <button class="nav-tab" data-tab="register">📝 Registro de Equipo</button>
+      <button id="tab-nav-admin" class="nav-tab" data-tab="admin" style="display: none;">👑 Panel Administrador</button>
+      <button id="tab-nav-certificates" class="nav-tab" data-tab="certificates" style="display: none;">🎖️ Reconocimientos</button>
+      <button id="tab-nav-ranking" class="nav-tab" data-tab="ranking" style="display: none;">🏆 Ranking Nacional</button>
+      <button id="tab-nav-judge" class="nav-tab" data-tab="judge" style="display: none;">⚖️ Portal del Juez</button>
+      <button id="tab-nav-agents" class="nav-tab" data-tab="agents" style="display: none;">🤖 Agentes Antigravity</button>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+
+    <!-- ========================================== -->
+    <!-- TAB: HOME / CONVOCATORIA NACIONAL          -->
+    <!-- ========================================== -->
+    <section id="tab-home" class="tab-pane active">
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+          <div style="flex: 1; min-width: 320px;">
+            <span class="badge" style="background: rgba(255,255,255,0.2); color: white; margin-bottom: 0.75rem;">
+              Concurso Nacional en Línea • 2026
+            </span>
+            <h2 class="hero-title">Mendix Agile Challenge</h2>
+            <p class="hero-subtitle">
+              El concurso nacional donde los estudiantes de <strong>Universidad Tecmilenio</strong> aplican metodologías
+              ágiles y desarrollan en <strong>Siemens Mendix</strong> un prototipo funcional para resolver el caso de
+              <strong>Gestión de Eventos Corporativos (GCS)</strong>.
+            </p>
+            <div class="hero-buttons">
+              <button class="btn btn-tec" onclick="App.openParticipantModal()">
+                🚀 Inscribir a mi Equipo
+              </button>
+              <button class="btn btn-secondary"
+                style="background: rgba(255,255,255,0.15); color:white; border-color: rgba(255,255,255,0.3);"
+                onclick="App.openLoginModal()">
+                ⚖️ Acceso para Jueces y Administrador
+              </button>
+            </div>
+          </div>
+          <div style="text-align: center;">
+            <img src="LogoMendixChallenge_1_Edition.png" alt="Logo Mendix Agile Challenge 1ra Edición"
+              style="max-height: 190px; max-width: 280px; object-fit: contain; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.35));">
+          </div>
+        </div>
+      </div>
+
+      <!-- Competencias y Criterios Clave -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Caso de Negocio</div>
+          <div style="font-weight: 800; font-size: 1.15rem; color: var(--text-primary); margin: 0.4rem 0;">
+            Gestión de Eventos (GCS)
+          </div>
+          <div class="kpi-desc">Módulos articulados de Eventos, Asistentes y Tareas de seguimiento.</div>
+        </div>
+
+        <div class="kpi-card kpi-mendix">
+          <div class="kpi-label">Plataforma Tecnológica</div>
+          <div style="font-weight: 800; font-size: 1.15rem; color: var(--mendix-blue); margin: 0.4rem 0;">
+            Siemens Mendix Low-Code
+          </div>
+          <div class="kpi-desc">Modelado de dominio (ERD), microflujos con persistencia y diseño en Atlas UI.</div>
+        </div>
+
+        <div class="kpi-card kpi-warning">
+          <div class="kpi-label">Metodología Ágil</div>
+          <div style="font-weight: 800; font-size: 1.15rem; color: var(--warning); margin: 0.4rem 0;">
+            Scrum & Sprints
+          </div>
+          <div class="kpi-desc">Backlog con historias Gherkin, estimación y bitácora documentada de pruebas.</div>
+        </div>
+      </div>
+
+      <!-- Resumen de Entregables Requeridos -->
+      <div class="card">
+        <div class="card-title">Requisitos Obligatorios de Participación</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid var(--tec-green);">
+            <h4 style="font-weight: 800; margin-bottom: 0.4rem;">1. Aval del profesor</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
+              Documento en formato PDF firmado por el profesor del campus Tecmilenio que avala el cumplimiento de los
+              requisitos obligatorios para participar.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.82rem;">
+              <a href="Plantilla_AvalDocente.pdf" download="Plantilla_AvalDocente.pdf"
+                style="color: var(--tec-green); font-weight: 700; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.35rem;">
+                📥 Descarga aquí la plantilla
+              </a>
+              <a href="Manual_Etapa_Docente_Mendix_Agile_Challenge.pdf"
+                download="Manual_Etapa_Docente_Mendix_Agile_Challenge.pdf"
+                style="color: var(--mendix-blue); font-weight: 700; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.35rem;">
+                📘 Descarga aquí el manual
+              </a>
+            </div>
+          </div>
+
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid var(--mendix-blue);">
+            <h4 style="font-weight: 800; margin-bottom: 0.4rem;">2. Documento Técnico del Proyecto (PDF)</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Incluye el Modelo de Dominio de Mendix o ERD, explicación de microflujos, prueba de persistencia, backlog
+              ágil y bitácora de pruebas.
+            </p>
+          </div>
+
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-left: 4px solid var(--warning);">
+            <h4 style="font-weight: 800; margin-bottom: 0.4rem;">3. Video Demostrativo (Máx. 3 Minutos)</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Demostración en video del flujo funcional sin cortes: creación de evento, asistente, tareas, avisos,
+              calendario y experiencia de usuario.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: REGISTRO DE PARTICIPANTES             -->
+    <!-- ========================================== -->
+    <section id="tab-register" class="tab-pane">
+      <div class="card" style="max-width: 900px; margin: 0 auto;">
+        <div class="card-title">
+          <div>
+            <h2 style="font-size: 1.4rem; font-weight: 900;">Inscripción de Equipo Participante</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 500;">
+              Completa los datos de tu equipo. Al finalizar se generará tu <strong>Código Único de
+                Participante</strong>.
+            </p>
+          </div>
+          <span class="autosave-pill" id="autosave-participant-indicator">
+            💾 Autoguardado activo
+          </span>
+        </div>
+
+        <form id="form-participant-registration"
+          onsubmit="event.preventDefault(); App.submitParticipantRegistration();">
+
+          <!-- Datos Generales del Equipo -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: var(--tec-green);">
+              1. Identificación del Equipo y Campus
+            </h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label class="form-label">Nombre del Equipo *</label>
+                <input type="text" id="reg-team-name" class="form-control" placeholder="Ej: InnovaMendix Tec" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Nombre del Campus Tecmilenio *</label>
+                <select id="reg-campus" class="form-control" required>
+                  <option value="">-- Seleccionar Campus --</option>
+                  <!-- Llenado dinámicamente con TECMILENIO_CAMPUS -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Profesor Responsable (sin palabra Asesor) -->
+            <div style="margin-top: 0.5rem;">
+              <label class="form-label">Profesor Responsable</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <input type="text" id="reg-prof-name" class="form-control" placeholder="Nombres del Profesor" required>
+                <input type="text" id="reg-prof-lastname" class="form-control" placeholder="Apellidos del Profesor"
+                  required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Datos del Capitán -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: var(--mendix-blue);">
+              2. Datos del Capitán del Equipo
+            </h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label">Nombres del Capitán *</label>
+                <input type="text" id="reg-cap-name" class="form-control" placeholder="Ej: Ana Sofía" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Apellidos del Capitán *</label>
+                <input type="text" id="reg-cap-lastname" class="form-control" placeholder="Ej: Garza Morales" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label class="form-label">Matrícula Institucional (Única) *</label>
+                <input type="text" id="reg-cap-id" class="form-control" placeholder="Ej: AL02984120" required>
+                <small style="color: var(--text-muted); font-size: 0.72rem;">Las matrículas de los alumnos son
+                  únicas.</small>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Correo Institucional *</label>
+                <input type="email" id="reg-cap-email" class="form-control" placeholder="usuario@tecmilenio.mx" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Integrantes Adicionales -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size: 1rem; font-weight: 800; color: var(--siemens-navy);">
+                3. Integrantes del Equipo (Hasta 3 alumnos)
+              </h3>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="App.addMemberField()">
+                ➕ Agregar Integrante
+              </button>
+            </div>
+
+            <div id="members-fields-container">
+              <!-- Renderizado de integrantes -->
+            </div>
+          </div>
+
+          <!-- Carga de Archivos y Video (Guardado de archivos) -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: var(--warning);">
+              4. Carga de Datos y Entregables para Participar
+            </h3>
+
+            <div class="form-group">
+              <label class="form-label">Aval del Profesor (Archivo PDF) *</label>
+              <input type="file" id="reg-file-approval" accept=".pdf" class="form-control"
+                onchange="App.handleFileSelect(event, 'approval')">
+              <small style="color: var(--text-muted); font-size: 0.72rem;">Adjunta la carta o formato firmado en
+                PDF (Se almacena en el sistema para descarga).</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Documento PDF del Proyecto *</label>
+              <input type="file" id="reg-file-doc" accept=".pdf" class="form-control"
+                onchange="App.handleFileSelect(event, 'doc')">
+              <small style="color: var(--text-muted); font-size: 0.72rem;">Documento técnico con ERD, microflujos,
+                persistencia, backlog y pruebas (Se almacena en el sistema para descarga).</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Enlace al Video (Máximo 3 Minutos) *</label>
+              <input type="url" id="reg-video-url" class="form-control" placeholder="https://youtu.be/..." required>
+              <small style="color: var(--text-muted); font-size: 0.72rem;">Pega el enlace público o no listado (YouTube,
+                Drive, Vimeo) con el recorrido funcional.</small>
+            </div>
+          </div>
+
+          <!-- Botón de Envío -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="btn btn-secondary" onclick="App.clearParticipantFormDraft()">
+              Limpiar Borrador
+            </button>
+            <button type="submit" class="btn btn-tec" style="padding: 0.75rem 2rem; font-size: 1rem;">
+              ✅ Completar Registro y Generar Código Único
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: RANKING NACIONAL OFICIAL              -->
+    <!-- ========================================== -->
+    <section id="tab-ranking" class="tab-pane">
+      <div class="card">
+        <div class="card-title">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 900;">Tabla Oficial de Clasificación Nacional (Top 10)</h2>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button id="btn-toggle-ranking-visibility" class="btn btn-sm btn-outline" style="display: none;" onclick="App.toggleRankingVisibility()">
+              🌐 Visibilidad
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Imprimir Cédula</button>
+            <button class="btn btn-tec btn-sm" onclick="App.exportRankingCSV()">📊 Exportar CSV</button>
+          </div>
+        </div>
+
+        <!-- Criterio de Desempate Oficial Banner (Visible ÚNICAMENTE para Administrador) -->
+        <div id="ranking-tiebreaker-banner"
+          style="display: none; background: var(--bg-subtle); border-left: 4px solid var(--tec-green); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1.5rem;">
+          <strong>Regla Oficial de Desempate:</strong> En caso de empate en la calificación final, se comparan los
+          subtotales en el orden estricto:
+          <strong>Mayor Subtotal A</strong> &rarr; <strong>Mayor C</strong> &rarr; <strong>Mayor E</strong> &rarr;
+          <strong>Mayor D</strong> &rarr; <strong>Mayor B</strong> &rarr; <strong>Mayor G</strong>.
+        </div>
+
+        <!-- Podio Visual Top 3 -->
+        <div id="ranking-podium-container"
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          <!-- Inyectado por JS -->
+        </div>
+
+        <!-- Tabla Completa de Calificaciones (Listando solo 10 primeros lugares) -->
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lugar</th>
+                <th>Folio</th>
+                <th>Equipo</th>
+                <th>Campus</th>
+                <th>Subtotal A (40)</th>
+                <th>Subtotal B (15)</th>
+                <th>Subtotal C (15)</th>
+                <th>Subtotal D (15)</th>
+                <th>Subtotal E (15)</th>
+                <th>R (100)</th>
+                <th>Aporte R (90%)</th>
+                <th>G (10)</th>
+                <th style="color: var(--tec-green); font-weight: 900;">FINAL / 100</th>
+              </tr>
+            </thead>
+            <tbody id="ranking-table-body">
+              <!-- Inyectado por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: RECONOCIMIENTOS OFICIALES (ADMIN)     -->
+    <!-- ========================================== -->
+    <section id="tab-certificates" class="tab-pane">
+      <div class="card">
+        <div class="card-title" style="flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--siemens-navy);">🎖️ Centro de Emisión y Envío de Reconocimientos</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Emisión de diplomas oficiales editables para <strong>Equipos Participantes</strong>, <strong>Jueces Evaluadores</strong> y <strong>Ganadores Nacionales</strong>.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="Reconocimientos_Mendix_Editables.pptx" download="Reconocimientos_Mendix_Editables.pptx" class="btn btn-secondary btn-sm" title="Descargar archivo PowerPoint con las diapositivas oficiales">
+              📥 Descargar Plantilla PowerPoint (.pptx)
+            </a>
+          </div>
+        </div>
+
+        <!-- Subtabs de Selección de Categoría de Reconocimientos -->
+        <div class="cert-category-nav" style="display: flex; gap: 0.5rem; margin: 1rem 0 1.5rem 0; border-bottom: 2px solid var(--border-color); padding-bottom: 0.75rem; flex-wrap: wrap;">
+          <button id="btn-cert-tab-captains" class="btn btn-sm btn-tec" onclick="App.switchCertCategory('captains')">
+            👥 Equipos Inscritos (Capitanes)
+          </button>
+          <button id="btn-cert-tab-judges" class="btn btn-sm btn-secondary" onclick="App.switchCertCategory('judges')">
+            ⚖️ Jueces Evaluadores
+          </button>
+          <button id="btn-cert-tab-winners" class="btn btn-sm btn-secondary" onclick="App.switchCertCategory('winners')">
+            🏆 Ganadores del Concurso
+          </button>
+        </div>
+
+        <!-- CATEGORÍA 1: Equipos Participantes / Capitanes (Slide 1) -->
+        <div id="cert-panel-captains" class="cert-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--tec-green);">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 800;">Reconocimientos de Participación por Equipo (Slide 1)</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Se otorga a cada equipo completo por su solución desarrollada en Mendix. El reconocimiento se enviará al correo del <strong>Capitán</strong> del equipo.
+              </p>
+            </div>
+            <button class="btn btn-tec btn-sm" onclick="App.sendBatchCertificates('captains')">
+              📧 Enviar Reconocimiento a Todos los Capitanes
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Equipo</th>
+                  <th>Campus</th>
+                  <th>Capitán & Correo</th>
+                  <th>Integrantes</th>
+                  <th>Estado Envío</th>
+                  <th style="text-align: right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="cert-captains-table-body">
+                <!-- Inyectado por JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CATEGORÍA 2: Jueces Evaluadores (Slide 5) -->
+        <div id="cert-panel-judges" class="cert-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--mendix-blue);">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 800;">Reconocimientos a Jueces Evaluadores (Slide 5)</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Se otorga a cada juez por aportar su experiencia técnica en la evaluación de proyectos del certamen.
+              </p>
+            </div>
+            <button class="btn btn-mendix btn-sm" onclick="App.sendBatchCertificates('judges')">
+              📧 Enviar Reconocimiento a Todos los Jueces
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nómina</th>
+                  <th>Juez</th>
+                  <th>Campus</th>
+                  <th>Correo Institucional</th>
+                  <th>Estado Envío</th>
+                  <th style="text-align: right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="cert-judges-table-body">
+                <!-- Inyectado por JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CATEGORÍA 3: Ganadores del Concurso (Slides 2, 3 y 4) -->
+        <div id="cert-panel-winners" class="cert-panel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--warning);">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 800;">Reconocimientos Especiales a Ganadores Nacionales (Slides 2, 3 y 4)</h3>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                Diplomas para el <strong>Primer, Segundo y Tercer Lugar Nacional</strong> con medallas e insignias oficiales editadas con los nombres de los galardonados.
+              </p>
+            </div>
+            <button class="btn btn-warning btn-sm" onclick="App.sendBatchCertificates('winners')">
+              📧 Enviar Reconocimiento a Todos los Ganadores
+            </button>
+          </div>
+
+          <div id="cert-winners-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.5rem;">
+            <!-- Inyectado por JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: PANEL ADMINISTRADOR (ROL ADMIN)       -->
+    <!-- ========================================== -->
+    <section id="tab-admin" class="tab-pane">
+      <div class="card"
+        style="background: linear-gradient(135deg, var(--bg-card) 0%, var(--tec-green-light) 100%); border-left: 5px solid var(--tec-green);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.6rem; font-weight: 900; color: var(--siemens-navy);">Panel de Control Nacional
+              (Administrador)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+              Sesión activa: <strong>admin@tecmilenio.mx</strong> • Gestión integral de participantes, jueces y
+              asignaciones.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-mendix" onclick="App.generateOfficialRanking()">
+              🏆 Generar Ranking Nacional
+            </button>
+            <button class="btn btn-tec" onclick="App.runAutoAssignmentWorkflow()">
+              ⚡ Ejecutar Asignación Automática Equitativa
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerta de Jueces Pendientes -->
+      <div class="card" style="border-left: 4px solid var(--warning);">
+        <div class="card-title" style="color: var(--warning); margin-bottom: 0.5rem;">
+          ⚠️ Monitoreo de Jueces con Calificaciones Pendientes
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Lista de evaluadores que aún no han concluido y confirmado la totalidad de sus proyectos asignados:
+        </p>
+        <div id="admin-pending-judges-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <!-- Inyectado dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Tabla de Participantes con Asignación de Juez (Ordenados de mayor a menor por calificación) -->
+      <div class="card">
+        <div class="card-title">
+          <span>Padrón de Participantes Registrados (Ordenados por Calificación)</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;" id="admin-participants-count">0
+            equipos</span>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>Equipo</th>
+                <th>Campus</th>
+                <th>Capitán & Matrícula</th>
+                <th>Entregables</th>
+                <th>Juez Asignado (Editable)</th>
+                <th>Estado (Calificación)</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-participants-table-body">
+              <!-- Inyectado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabla de Jueces Registrados -->
+      <div class="card">
+        <div class="card-title">
+          <span>Padrón Oficial de Jueces Evaluadores</span>
+          <button class="btn btn-secondary btn-sm" onclick="App.openJudgeRegistrationModal()">+ Registrar Nuevo
+            Juez</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre del Juez</th>
+                <th>Nómina</th>
+                <th>Campus</th>
+                <th>Correo Institucional</th>
+                <th>Carga Asignada</th>
+                <th>Estatus de Confirmación</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-judges-table-body">
+              <!-- Inyectado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: PORTAL DEL JUEZ (ROL JUEZ)            -->
+    <!-- ========================================== -->
+    <section id="tab-judge" class="tab-pane">
+      <div class="card"
+        style="background: linear-gradient(135deg, var(--bg-card) 0%, var(--mendix-blue-light) 100%); border-left: 5px solid var(--mendix-blue);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--siemens-navy);">
+              Cédula de Evaluación Oficial • Vista del Juez
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);" id="judge-welcome-meta">
+              Bienvenido Juez. Solo puedes calificar a los proyectos que te fueron asignados equitativamente.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selector de Proyectos Asignados -->
+      <div class="card">
+        <label for="judge-assigned-select"
+          style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem; display: block;">
+          Selecciona el Proyecto Asignado a Calificar:
+        </label>
+        <select id="judge-assigned-select" class="form-control"
+          style="font-weight: 700; font-size: 1rem; padding: 0.65rem;"
+          onchange="App.onSelectJudgeParticipant(this.value)">
+          <!-- Inyectado por JS -->
+        </select>
+      </div>
+
+      <!-- Ficha del Proyecto Seleccionado -->
+      <div id="judge-project-dossier" class="card" style="display: none; background: var(--bg-subtle);">
+        <div
+          style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <span class="badge badge-campus" id="dossier-campus">Campus</span>
+            <h3 id="dossier-team-name" style="font-size: 1.4rem; font-weight: 900; margin: 0.2rem 0;">Nombre del Equipo
+            </h3>
+            <div style="font-size: 0.85rem; color: var(--text-muted);" id="dossier-folio">Folio: TEC-MAC-2026-XXXX</div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="dossier-links">
+            <!-- Enlaces de descarga a Video y Documentos -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Cédula de 20 Indicadores Observables y Valoración G -->
+      <div id="judge-rubric-container"
+        style="display: none; display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+
+        <!-- Bloques de Indicadores A, B, C, D, E -->
+        <div>
+          <!-- Instrucciones breves -->
+          <div
+            style="background: var(--bg-subtle); border-left: 3px solid var(--tec-green); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; margin-bottom: 1.25rem;">
+            <strong>Instrucciones:</strong> Puedes asignar puntuaciones decimales libres en cada indicador (máximo 5 pts c/u).
+            La suma de cada sección no debe exceder lo indicado: <strong>A (40 pts)</strong>, <strong>B (15 pts)</strong>,
+            <strong>C (15 pts)</strong>, <strong>D (15 pts)</strong> y <strong>E (15 pts)</strong>.
+            Fuentes: <strong>V</strong> = Video; <strong>D</strong> = Documento PDF; <strong>D y V</strong> = Ambas fuentes.
+          </div>
+
+          <!-- Bloque A: Funcionalidad e Integración (40 pts) -->
+          <div class="rubric-block">
+            <div class="rubric-block-header">
+              <h4>A. Funcionalidad e Integración (Máx. 40 Puntos)</h4>
+              <span class="badge badge-campus" id="subtotal-badge-A">Subtotal A: 0 / 40</span>
+            </div>
+            <div id="indicators-block-A">
+              <!-- A1 a A8 -->
+            </div>
+          </div>
+
+          <!-- Bloque B: Experiencia de Uso (15 pts) -->
+          <div class="rubric-block">
+            <div class="rubric-block-header">
+              <h4>B. Experiencia de Uso (Máx. 15 Puntos)</h4>
+              <span class="badge badge-campus" id="subtotal-badge-B">Subtotal B: 0 / 15</span>
+            </div>
+            <div id="indicators-block-B">
+              <!-- B1 a B3 -->
+            </div>
+          </div>
+
+          <!-- Bloque C: Construcción Técnica y Datos (15 pts) -->
+          <div class="rubric-block">
+            <div class="rubric-block-header">
+              <h4>C. Construcción Técnica y Datos (Máx. 15 Puntos)</h4>
+              <span class="badge badge-campus" id="subtotal-badge-C">Subtotal C: 0 / 15</span>
+            </div>
+            <div id="indicators-block-C">
+              <!-- C1 a C3 -->
+            </div>
+          </div>
+
+          <!-- Bloque D: Aplicación de Metodologías Ágiles (15 pts) -->
+          <div class="rubric-block">
+            <div class="rubric-block-header">
+              <h4>D. Aplicación de Metodologías Ágiles (Máx. 15 Puntos)</h4>
+              <span class="badge badge-campus" id="subtotal-badge-D">Subtotal D: 0 / 15</span>
+            </div>
+            <div id="indicators-block-D">
+              <!-- D1 a D3 -->
+            </div>
+          </div>
+
+          <!-- Bloque E: Pruebas y Mejora (15 pts) -->
+          <div class="rubric-block">
+            <div class="rubric-block-header">
+              <h4>E. Pruebas y Mejora (Máx. 15 Puntos)</h4>
+              <span class="badge badge-campus" id="subtotal-badge-E">Subtotal E: 0 / 15</span>
+            </div>
+            <div id="indicators-block-E">
+              <!-- E1 a E3 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Score Summary & Valoración Global G -->
+        <div>
+          <div class="score-summary-sticky">
+            <h3 style="font-size: 1.15rem; font-weight: 900; text-align: center; color: var(--siemens-navy);">
+              Cálculo Oficial de la Calificación
+            </h3>
+
+            <div
+              style="background: var(--bg-card); border-radius: var(--radius-md); padding: 1rem; margin: 1rem 0; font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                <span>Suma de Indicadores (R):</span>
+                <strong id="live-R-score">0 / 100</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                <span>Aporte Indicadores (R × 0.90):</span>
+                <strong id="live-contribution-R">0.00 / 90</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                <span>Valoración Global (G):</span>
+                <strong id="live-display-G">0.0 / 10</strong>
+              </div>
+              <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+              <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1rem;">
+                <span>CALIFICACIÓN FINAL:</span>
+                <span style="color: var(--tec-green);" id="live-final-score">0.00 / 100</span>
+              </div>
+            </div>
+
+            <!-- Gran Display de Puntuación -->
+            <div class="score-big-display" id="big-final-score-display">0.00</div>
+
+            <!-- Entrada de Valoración Global G -->
+            <div class="form-group" style="margin-top: 1rem;">
+              <label class="form-label">
+                Valoración Global del Juez (0 a 10 con 1 decimal): *
+              </label>
+              <input type="number" id="input-eval-G" class="form-control" min="0" max="10" step="0.1" value="0.0"
+                oninput="App.onUpdateScoreCalculations()">
+              <small style="color: var(--text-muted); font-size: 0.72rem;">
+                9.0-10.0 (Sólida/Integrada), 7.0-8.9 (Útil/Coherente), 5.0-6.9 (Parcial), 0.0-4.9 (Poca certeza).
+              </small>
+            </div>
+
+            <!-- Justificación Obligatoria de G -->
+            <div class="form-group">
+              <label class="form-label">Justificación Obligatoria de la Valoración Global: *</label>
+              <textarea id="input-eval-justification" class="form-control" rows="3"
+                placeholder="Escribe aquí la justificación fundamentada de tu juicio sobre la solución completa..."></textarea>
+            </div>
+
+            <div id="eval-action-buttons-container" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+              <button id="btn-save-draft" class="btn btn-secondary" onclick="App.saveCurrentProjectEvaluation(false)">
+                💾 Guardar Borrador
+              </button>
+              <button id="btn-lock-eval" class="btn btn-tec" onclick="App.saveCurrentProjectEvaluation(true)">
+                🔒 Guardar y Marcar Proyecto como Listo
+              </button>
+            </div>
+
+            <div id="eval-locked-notice" style="display: none; background: var(--tec-green-light); border: 2px solid var(--tec-green); color: var(--tec-green-hover); padding: 0.85rem; border-radius: var(--radius-md); font-weight: 800; text-align: center; margin-top: 1rem;">
+              🔒 Proyecto Evaluado y Bloqueado Definitivamente
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: AGENTES ANTIGRAVITY (SOLO ADMIN)      -->
+    <!-- ========================================== -->
+    <section id="tab-agents" class="tab-pane">
+      <div class="card">
+        <div class="card-title">
+          <span>Ecosistema de Custom Agents en Google Antigravity</span>
+          <span class="badge badge-campus">5 Agentes Especialistas</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+          Conforme a las especificaciones de <a href="https://antigravity.google/blog/introducing-custom-agents"
+            target="_blank" style="color: var(--mendix-blue); font-weight:700;">Introducing custom agents | Google
+            Antigravity Blog</a>, este proyecto cuenta con un equipo de agentes especializados instalados en
+          <code>.agents/agents/</code> y sus habilidades en <code>.agents/skills/</code>:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
+          <!-- Agente 1 -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-top: 4px solid var(--tec-green);">
+            <h4 style="font-weight: 800; font-size: 1rem;">1. mendix-agile-challenge</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Coordinador General del
+              Concurso</div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+              Supervisa el concurso nacional, calendario de sprints, dictámenes de jurado y resolución de controversias.
+            </p>
+            <div style="margin-top: 0.75rem; font-size: 0.75rem; font-weight: 700; color: var(--tec-green);">
+              Habilidad: <code>mendix-agile-challenge</code>
+            </div>
+          </div>
+
+          <!-- Agente 2 -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-top: 4px solid var(--mendix-blue);">
+            <h4 style="font-weight: 800; font-size: 1rem;">2. mendix-evaluator-judge</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Juez Técnico y Auditor de
+              Rúbrica</div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+              Aplica las puntuaciones de los 20 indicadores observables y la valoración global G fundamentada.
+            </p>
+            <div style="margin-top: 0.75rem; font-size: 0.75rem; font-weight: 700; color: var(--mendix-blue);">
+              Habilidad: <code>rubric-scoring-evaluation</code>
+            </div>
+          </div>
+
+          <!-- Agente 3 -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-top: 4px solid var(--warning);">
+            <h4 style="font-weight: 800; font-size: 1rem;">3. mendix-assignment-manager</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Gestor de Asignación y
+              Reglas de Campus</div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+              Garantiza la restricción dura de no evaluar equipos del mismo campus y balancea la carga entre jueces.
+            </p>
+            <div style="margin-top: 0.75rem; font-size: 0.75rem; font-weight: 700; color: var(--warning);">
+              Habilidad: <code>mendix-assignment-algorithm</code>
+            </div>
+          </div>
+
+          <!-- Agente 4 -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-top: 4px solid var(--siemens-navy);">
+            <h4 style="font-weight: 800; font-size: 1rem;">4. agile-scrum-coach</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Coach Ágil y Scrum Master
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+              Asesora a los alumnos en Product Backlog, historias Gherkin, planeación por sprints y matrices de pruebas.
+            </p>
+            <div style="margin-top: 0.75rem; font-size: 0.75rem; font-weight: 700; color: var(--siemens-navy);">
+              Habilidad: <code>agile-challenge-facilitation</code>
+            </div>
+          </div>
+
+          <!-- Agente 5 -->
+          <div
+            style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); border-top: 4px solid #8B5CF6;">
+            <h4 style="font-weight: 800; font-size: 1rem;">5. mendix-platform-admin</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Ingeniero Web y
+              Persistencia</div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+              Mantiene la arquitectura web (`app.js`, `data.js`), autoguardado, roles y respaldos JSON/CSV.
+            </p>
+            <div style="margin-top: 0.75rem; font-size: 0.75rem; font-weight: 700; color: #8B5CF6;">
+              Habilidad: <code>platform-web-dev</code>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="background: var(--bg-subtle); padding: 1.25rem; border-radius: var(--radius-md); margin-top: 2rem; border-left: 4px solid var(--tec-green);">
+          <h4 style="font-weight: 800; margin-bottom: 0.5rem;">¿Cómo Reutilizarlos en Google Antigravity?</h4>
+          <ol style="padding-left: 1.25rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">
+            <li><strong>Desde el Menú /agents:</strong> Escribe <code>/agents</code> en la consola o chat para
+              seleccionarlo como tu agente principal.</li>
+            <li><strong>Como Subagentes en Paralelo:</strong> Invócalos programáticamente mediante
+              <code>invoke_subagent</code> para auditar código, simular asignaciones o evaluar cédulas.</li>
+            <li><strong>Reutilizables en Otros Proyectos:</strong> Al estar estructurados en
+              <code>.agents/agents/</code> y <code>.agents/skills/</code>, puedes copiar estas carpetas a cualquier
+              repositorio de Mendix o certamen académico.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: INICIO DE SESIÓN                    -->
+  <!-- ========================================== -->
+  <div id="modal-login" class="modal-overlay">
+    <div class="modal-box" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 style="font-weight: 900; font-size: 1.15rem;">Acceso al Sistema</h3>
+        <button class="icon-btn" onclick="App.closeLoginModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="form-login" onsubmit="event.preventDefault(); App.submitLogin();">
+          <div class="form-group">
+            <label class="form-label">Usuario o Correo Institucional *</label>
+            <input type="text" id="login-email" class="form-control" placeholder="usuario@tecmilenio.mx" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contraseña *</label>
+            <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn btn-tec"
+            style="width: 100%; padding: 0.7rem; font-size: 0.95rem; margin-top: 0.5rem;">
+            Iniciar Sesión
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1rem; font-size: 0.82rem;">
+          <a href="javascript:void(0)" onclick="App.openJudgeRegistrationModal()"
+            style="color: var(--tec-green); font-weight: 700;">
+            ¿Eres Juez y no tienes cuenta? Crear Cuenta de Juez
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: REGISTRO DE CUENTA DE JUEZ          -->
+  <!-- ========================================== -->
+  <div id="modal-register-judge" class="modal-overlay">
+    <div class="modal-box" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3 style="font-weight: 900; font-size: 1.15rem;">Crear Cuenta de Juez Evaluador</h3>
+        <button class="icon-btn" onclick="App.closeJudgeRegistrationModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <small style="color: var(--text-muted);">Los datos de nómina y correo son estrictamente únicos.</small>
+          <span class="autosave-pill" id="autosave-judge-indicator">💾 Autoguardado</span>
+        </div>
+
+        <form id="form-judge-registration" onsubmit="event.preventDefault(); App.submitJudgeRegistration();">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Nombres *</label>
+              <input type="text" id="judge-reg-name" class="form-control" placeholder="Ej: Roberto" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Apellidos *</label>
+              <input type="text" id="judge-reg-lastname" class="form-control" placeholder="Ej: Treviño" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Nómina (Única) *</label>
+              <input type="text" id="judge-reg-payroll" class="form-control" placeholder="Ej: L00958421" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Campus Tecmilenio *</label>
+              <select id="judge-reg-campus" class="form-control" required>
+                <option value="">-- Seleccionar Campus --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Correo Institucional (Usuario para Login) *</label>
+            <input type="email" id="judge-reg-email" class="form-control" placeholder="nombre.apellido@tecmilenio.mx"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contraseña *</label>
+            <input type="password" id="judge-reg-password" class="form-control" placeholder="Crea una contraseña segura"
+              required>
+          </div>
+
+          <button type="submit" class="btn btn-tec"
+            style="width: 100%; padding: 0.7rem; font-size: 0.95rem; margin-top: 0.5rem;">
+            Registrar Cuenta de Juez
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CÓDIGO ÚNICO DE PARTICIPANTE        -->
+  <!-- ========================================== -->
+  <div id="modal-folio-success" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; text-align: center;">
+      <div class="modal-header">
+        <h3 style="font-weight: 900; color: var(--tec-green); margin: 0 auto;">¡Registro Exitoso!</h3>
+      </div>
+      <div class="modal-body" style="padding: 2rem 1.5rem;">
+        <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
+        <h4 id="success-team-name" style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem;">Equipo
+          Registrado</h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+          Tu equipo y entregables han sido recibidos satisfactoriamente por la coordinación nacional de Universidad
+          Tecmilenio.
+        </p>
+
+        <div
+          style="background: var(--bg-subtle); border: 2px dashed var(--tec-green); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+          <div
+            style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.2rem;">
+            Tu Código Único de Participante:
+          </div>
+          <div id="success-folio-code"
+            style="font-size: 1.8rem; font-weight: 900; color: var(--tec-green); letter-spacing: 0.05em;">
+            TEC-MAC-2026-XXXX
+          </div>
+        </div>
+
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Conserva este folio para consultar el estatus de tu evaluación con el comité organizador.
+        </p>
+
+        <button class="btn btn-tec" style="width: 100%; padding: 0.7rem;"
+          onclick="document.getElementById('modal-folio-success').classList.remove('active'); App.switchTab('home');">
+          Aceptar y Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: VISTA PREVIA Y DESCARGA DE DIPLOMA  -->
+  <!-- ========================================== -->
+  <div id="modal-certificate-preview" class="modal-overlay">
+    <div class="modal-box" style="max-width: 960px; width: 95%;">
+      <div class="modal-header">
+        <div>
+          <h3 id="cert-preview-title" style="font-weight: 900; font-size: 1.15rem;">Vista Previa del Reconocimiento Oficial</h3>
+          <small id="cert-preview-subtitle" style="color: var(--text-muted);">Plantilla oficial editable del Mendix Agile Challenge 2026</small>
+        </div>
+        <button class="icon-btn" onclick="App.closeCertificatePreview()">✕</button>
+      </div>
+
+      <div class="modal-body" style="text-align: center;">
+        <div id="cert-canvas-wrapper" style="overflow-x: auto; background: #e2e8f0; padding: 1rem; border-radius: var(--radius-md); box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);">
+          <canvas id="cert-canvas" width="2048" height="1365" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: var(--shadow-lg); background: white;"></canvas>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="font-size: 0.82rem; color: var(--text-secondary); text-align: left;">
+            <span id="cert-preview-recipient-info"><strong>Destinatario:</strong> -</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="App.printCertificateFromModal()">
+              🖨️ Imprimir / Guardar en PDF
+            </button>
+            <button class="btn btn-mendix btn-sm" onclick="App.downloadCertificatePNG()">
+              📥 Descargar Reconocimiento (PNG HD)
+            </button>
+            <button id="btn-cert-send-now" class="btn btn-tec btn-sm" onclick="App.sendCurrentCertificateEmail()">
+              📧 Enviar por Correo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ENVÍO DE CORREO ELECTRÓNICO         -->
+  <!-- ========================================== -->
+  <div id="modal-email-sender" class="modal-overlay">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 style="font-weight: 900; font-size: 1.15rem;">📧 Notificación y Envío de Reconocimiento</h3>
+        <button class="icon-btn" onclick="App.closeEmailSenderModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--tec-green); margin-bottom: 1rem;">
+          <div style="font-size: 0.85rem; margin-bottom: 0.35rem;">
+            <strong>Para:</strong> <span id="email-sender-to" style="color: var(--mendix-blue); font-weight: 700;">-</span>
+          </div>
+          <div style="font-size: 0.85rem; margin-bottom: 0.35rem;">
+            <strong>Asunto:</strong> <span id="email-sender-subject">🎓 Reconocimiento Oficial • Mendix Agile Challenge 2026</span>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">
+            <strong>Adjunto:</strong> <span id="email-sender-attachment" class="badge badge-campus">Reconocimiento_Oficial.png</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mensaje para el Destinatario:</label>
+          <textarea id="email-sender-body" class="form-control" rows="5" readonly style="font-size: 0.82rem; line-height: 1.5;"></textarea>
+        </div>
+
+        <div id="email-send-progress-container" style="display: none; margin: 1rem 0;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;" id="email-progress-status">Transmitiendo vía servidor seguro...</div>
+          <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
+            <div id="email-progress-bar" style="background: var(--tec-green); width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+          <button class="btn btn-secondary btn-sm" onclick="App.closeEmailSenderModal()">Cancelar</button>
+          <button id="btn-confirm-send-email" class="btn btn-tec btn-sm" onclick="App.executeEmailSend()">
+            🚀 Confirmar y Enviar Correo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor Toast -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div
+      style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <strong>Mendix Agile Challenge</strong> • Universidad Tecmilenio & Siemens Mendix
+      </div>
+      <div>
+        Cuenta Administrador: <code>admin@tecmilenio.mx</code> | Despliegue con Custom Agents de Antigravity
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="cert_logos.js?v=20261119c"></script>
+  <script src="app.js?v=20261119c"></script>
+</body>
+
+</html>
